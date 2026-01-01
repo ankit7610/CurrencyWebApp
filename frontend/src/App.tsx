@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import { cacheService } from './services/CacheService';
 
 interface Currency {
   code: string;
@@ -39,46 +40,82 @@ function App() {
     }
   }, [fromCurrency, toCurrency, amount]);
 
+  const [lastCallTime, setLastCallTime] = useState<number>(0);
+  const THROTTLE_MS = 500; // 500ms throttling manually
+
   const fetchCurrencies = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/currencies`);
+      const url = `${API_BASE_URL}/currencies`;
+
+      // Check cache first
+      const cachedData = await cacheService.getResponse(url);
+      if (cachedData) {
+        processCurrencyData(cachedData);
+        return;
+      }
+
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch currencies');
 
       const data = await response.json();
-      const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
-        code,
-        rate: rate as number
-      }));
+      await cacheService.saveResponse(url, data);
 
-      setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
+      processCurrencyData(data);
     } catch (err) {
       setError('Failed to load currencies. Please ensure the backend is running.');
       console.error(err);
     }
   };
 
+  const processCurrencyData = (data: any) => {
+    const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
+      code,
+      rate: rate as number
+    }));
+    setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
+  };
+
   const convertCurrency = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
+
+    // Rate limiter (throttling)
+    const now = Date.now();
+    if (now - lastCallTime < THROTTLE_MS) return;
+    setLastCallTime(now);
 
     setLoading(true);
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/convert`, {
+      const url = `${API_BASE_URL}/convert`;
+      const body = {
+        from: fromCurrency,
+        to: toCurrency,
+        amount: parseFloat(amount),
+      };
+
+      // Check cache first
+      const cachedData = await cacheService.getResponse(url, body);
+      if (cachedData) {
+        setConvertedAmount(cachedData.convertedAmount);
+        setExchangeRate(cachedData.rate);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          from: fromCurrency,
-          to: toCurrency,
-          amount: parseFloat(amount),
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) throw new Error('Conversion failed');
 
       const data: ConversionResponse = await response.json();
+      await cacheService.saveResponse(url, data, body);
+
       setConvertedAmount(data.convertedAmount);
       setExchangeRate(data.rate);
     } catch (err) {
