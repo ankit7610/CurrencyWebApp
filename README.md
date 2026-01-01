@@ -67,13 +67,18 @@ A full-stack currency conversion application with real-time exchange rates.
 
 ## 🌟 Features
 
-- ✨ **Premium UI Design** with glassmorphism effects and smooth animations
+- 🎨 **Futuristic UI Design** with cyberpunk-inspired aesthetics
+- 🌓 **Dark/Light Mode Toggle** - Switch between themes with smooth transitions
+- ✨ **Advanced Animations** - Floating particles, rotating borders, and smooth transitions
+- 💫 **Neon Effects** - Glowing borders and pulsing elements
 - 🔄 **Real-time Currency Conversion** with live exchange rates
 - 💱 **150+ Currencies** supported
-- 🎨 **Responsive Design** works on all devices
-- ⚡ **Fast Performance** with caching enabled
+- 📱 **Fully Responsive** - Works beautifully on all devices
+- ⚡ **Fast Performance** with backend caching
 - 🔒 **Secure API Key** stored only in backend
-- 🎭 **Interactive Elements** with hover effects and transitions
+- 🎭 **Interactive Elements** with hover effects and micro-animations
+- 🌐 **Animated Grid Background** with floating particles
+- 💎 **Glassmorphism Effects** with backdrop blur
 
 ## 📡 API Endpoints
 
@@ -117,13 +122,29 @@ Converts an amount from one currency to another.
 
 ## 🎨 UI Features
 
-- **Gradient Background** with animated effects
-- **Glassmorphism Cards** with backdrop blur
-- **Smooth Animations** on all interactions
-- **Custom Dropdowns** with styled options
-- **Loading States** with elegant spinners
-- **Error Handling** with user-friendly messages
-- **Swap Button** with rotation animation
+### Dark Mode (Default)
+- **Deep Space Background** with animated grid overlay
+- **Neon Cyan Accents** (#00f0ff) with glowing effects
+- **Floating Particles** creating a dynamic atmosphere
+- **Glassmorphic Cards** with cyan borders
+- **Gradient Text** from cyan to purple
+
+### Light Mode
+- **Clean White/Gray Background** with subtle animations
+- **Professional Blue Accents** (#0066cc)
+- **Soft Shadows** and elegant styling
+- **Bright, Accessible** color scheme
+- **Gradient Text** from blue to purple
+
+### Interactive Elements
+- **Theme Toggle Button** - Smooth rotation animation when switching modes
+- **Animated Borders** - Rotating gradient borders on hover
+- **Swap Button** - 180° rotation with glow effect
+- **Input Fields** - Glowing borders on focus
+- **Loading Spinner** - Triple-ring animated loader
+- **Result Display** - Count-up animation with gradient numbers
+- **Blinking Rate Indicator** - Live status indicator
+- **Floating Particles** - Continuous upward animation
 
 ## 🔧 Configuration
 
