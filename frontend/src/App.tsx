@@ -144,25 +144,15 @@ function App() {
 
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
-      {/* Animated background */}
-      <div className="background-animation">
-        <div className="grid-overlay"></div>
-        <div className="floating-particles">
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="particle" style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 10}s`
-            }}></div>
-          ))}
-        </div>
-      </div>
-
       <div className="container">
         {/* Theme Toggle */}
         <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
           {isDarkMode ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="5" />
               <line x1="12" y1="1" x2="12" y2="3" />
               <line x1="12" y1="21" x2="12" y2="23" />
@@ -172,10 +162,6 @@ function App() {
               <line x1="21" y1="12" x2="23" y2="12" />
               <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           )}
         </button>
@@ -197,8 +183,6 @@ function App() {
         </header>
 
         <div className="converter-card">
-          <div className="card-glow"></div>
-
           {error && (
             <div className="error-message">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -213,7 +197,6 @@ function App() {
           <div className="input-group">
             <label htmlFor="amount-input" className="label">
               <span className="label-text">Amount</span>
-              <span className="label-line"></span>
             </label>
             <div className="input-wrapper">
               <input
@@ -224,7 +207,6 @@ function App() {
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
               />
-              <div className="input-border"></div>
             </div>
           </div>
 
@@ -232,7 +214,6 @@ function App() {
             <div className="currency-select-group">
               <label htmlFor="from-currency" className="label">
                 <span className="label-text">From</span>
-                <span className="label-line"></span>
               </label>
               <div className="select-wrapper">
                 <select
@@ -247,7 +228,6 @@ function App() {
                     </option>
                   ))}
                 </select>
-                <div className="select-border"></div>
               </div>
             </div>
 
@@ -261,13 +241,11 @@ function App() {
                   <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16" />
                 </svg>
               </div>
-              <div className="swap-glow"></div>
             </button>
 
             <div className="currency-select-group">
               <label htmlFor="to-currency" className="label">
                 <span className="label-text">To</span>
-                <span className="label-line"></span>
               </label>
               <div className="select-wrapper">
                 <select
@@ -282,18 +260,13 @@ function App() {
                     </option>
                   ))}
                 </select>
-                <div className="select-border"></div>
               </div>
             </div>
           </div>
 
           {loading && (
             <div className="loading-container">
-              <div className="loading-spinner">
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-              </div>
+              <div className="loading-spinner"></div>
               <p className="loading-text">Processing...</p>
             </div>
           )}
@@ -308,11 +281,9 @@ function App() {
                 </div>
                 {exchangeRate && (
                   <div className="exchange-rate">
-                    <div className="rate-indicator"></div>
                     <span>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</span>
                   </div>
                 )}
-                <div className="result-glow"></div>
               </div>
             </div>
           )}

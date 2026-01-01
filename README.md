@@ -122,19 +122,20 @@ Converts an amount from one currency to another.
 
 ## 🎨 UI Features
 
-### Dark Mode (Default)
-- **Deep Space Background** with animated grid overlay
-- **Neon Cyan Accents** (#00f0ff) with glowing effects
-- **Floating Particles** creating a dynamic atmosphere
-- **Glassmorphic Cards** with cyan borders
-- **Gradient Text** from cyan to purple
+### Minimal & Clean Design
+- **Modern Typography** - Uses clean sans-serif fonts for better readability.
+- **Distraction-Free Interface** - Removed excess animations and particles.
+- **Adaptive Theme** - Automatically switches between a professional light mode and a sleek dark mode.
+
+### Dark Mode
+- **Slate Gray Background** suitable for low-light environments.
+- **High Contrast Text** for readability.
+- **Soft Blue Accents** for focus states.
 
 ### Light Mode
-- **Clean White/Gray Background** with subtle animations
-- **Professional Blue Accents** (#0066cc)
-- **Soft Shadows** and elegant styling
-- **Bright, Accessible** color scheme
-- **Gradient Text** from blue to purple
+- **Clean White/Gray Background** for a professional look.
+- **Royal Blue Accents** for clarity.
+- **Subtle Shadows** for depth without clutter.
 
 ### Interactive Elements
 - **Theme Toggle Button** - Smooth rotation animation when switching modes

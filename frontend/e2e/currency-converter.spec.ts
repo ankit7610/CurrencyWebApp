@@ -154,16 +154,6 @@ test.describe('Currency Converter - UI and Functionality', () => {
         await expect(page.locator('.converter-card')).toBeVisible();
     });
 
-    test('should have animated background elements', async ({ page }) => {
-        // Check for background animation
-        await expect(page.locator('.background-animation')).toBeVisible();
-
-        // Check for grid overlay
-        await expect(page.locator('.grid-overlay')).toBeVisible();
-
-        // Check for floating particles
-        await expect(page.locator('.floating-particles')).toBeVisible();
-    });
 
     test('should display footer with correct information', async ({ page }) => {
         const footer = page.locator('.footer');
