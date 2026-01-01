@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { cacheService } from './services/CacheService';
-
-interface Currency {
-  code: string;
-  rate: number;
-}
+import { ThemeToggle } from './components/ThemeToggle';
+import { Header } from './components/Header';
+import { CurrencyInput } from './components/CurrencyInput';
+import { CurrencySelect, type Currency } from './components/CurrencySelect';
+import { SwapButton } from './components/SwapButton';
+import { ConversionResult } from './components/ConversionResult';
 
 interface ConversionResponse {
   from: string;
@@ -25,29 +26,25 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [lastCallTime, setLastCallTime] = useState<number>(0);
 
+  const THROTTLE_MS = 500;
   const API_BASE_URL = 'http://localhost:8080/api';
 
-  // Fetch available currencies on mount
   useEffect(() => {
     fetchCurrencies();
   }, []);
 
-  // Convert currency when inputs change
   useEffect(() => {
     if (amount && parseFloat(amount) > 0) {
       convertCurrency();
     }
   }, [fromCurrency, toCurrency, amount]);
 
-  const [lastCallTime, setLastCallTime] = useState<number>(0);
-  const THROTTLE_MS = 500; // 500ms throttling manually
-
   const fetchCurrencies = async () => {
     try {
       const url = `${API_BASE_URL}/currencies`;
 
-      // Check cache first
       const cachedData = await cacheService.getResponse(url);
       if (cachedData) {
         processCurrencyData(cachedData);
@@ -78,7 +75,6 @@ function App() {
   const convertCurrency = async () => {
     if (!amount || parseFloat(amount) <= 0) return;
 
-    // Rate limiter (throttling)
     const now = Date.now();
     if (now - lastCallTime < THROTTLE_MS) return;
     setLastCallTime(now);
@@ -94,7 +90,6 @@ function App() {
         amount: parseFloat(amount),
       };
 
-      // Check cache first
       const cachedData = await cacheService.getResponse(url, body);
       if (cachedData) {
         setConvertedAmount(cachedData.convertedAmount);
@@ -105,9 +100,7 @@ function App() {
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -127,7 +120,6 @@ function App() {
   };
 
   const handleAmountChange = (value: string) => {
-    // Allow only numbers and decimal point
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
@@ -145,42 +137,8 @@ function App() {
   return (
     <div className={`app ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
       <div className="container">
-        {/* Theme Toggle */}
-        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-          {isDarkMode ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          )}
-        </button>
-
-        <header className="header">
-          <div className="logo-container">
-            <div className="logo-icon">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" />
-                <path d="M18 24h12M24 18v12" stroke="currentColor" strokeWidth="2" />
-              </svg>
-            </div>
-            <h1 className="title">
-              <span className="title-main">CURRENCY</span>
-              <span className="title-sub">CONVERTER</span>
-            </h1>
-          </div>
-          <p className="subtitle">Real-time exchange rates • Powered by AI</p>
-        </header>
+        <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
+        <Header />
 
         <div className="converter-card">
           {error && (
@@ -194,74 +152,26 @@ function App() {
             </div>
           )}
 
-          <div className="input-group">
-            <label htmlFor="amount-input" className="label">
-              <span className="label-text">Amount</span>
-            </label>
-            <div className="input-wrapper">
-              <input
-                id="amount-input"
-                type="text"
-                className="amount-input"
-                value={amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="0.00"
-              />
-            </div>
-          </div>
+          <CurrencyInput amount={amount} onAmountChange={handleAmountChange} />
 
           <div className="currency-row">
-            <div className="currency-select-group">
-              <label htmlFor="from-currency" className="label">
-                <span className="label-text">From</span>
-              </label>
-              <div className="select-wrapper">
-                <select
-                  id="from-currency"
-                  className="currency-select"
-                  value={fromCurrency}
-                  onChange={(e) => setFromCurrency(e.target.value)}
-                >
-                  {currencies.map((currency) => (
-                    <option key={currency.code} value={currency.code}>
-                      {currency.code}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            <CurrencySelect
+              id="from-currency"
+              label="From"
+              value={fromCurrency}
+              currencies={currencies}
+              onChange={setFromCurrency}
+            />
 
-            <button
-              className="swap-button"
-              onClick={swapCurrencies}
-              aria-label="Swap currencies"
-            >
-              <div className="swap-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16" />
-                </svg>
-              </div>
-            </button>
+            <SwapButton onSwap={swapCurrencies} />
 
-            <div className="currency-select-group">
-              <label htmlFor="to-currency" className="label">
-                <span className="label-text">To</span>
-              </label>
-              <div className="select-wrapper">
-                <select
-                  id="to-currency"
-                  className="currency-select"
-                  value={toCurrency}
-                  onChange={(e) => setToCurrency(e.target.value)}
-                >
-                  {currencies.map((currency) => (
-                    <option key={currency.code} value={currency.code}>
-                      {currency.code}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            <CurrencySelect
+              id="to-currency"
+              label="To"
+              value={toCurrency}
+              currencies={currencies}
+              onChange={setToCurrency}
+            />
           </div>
 
           {loading && (
@@ -272,20 +182,12 @@ function App() {
           )}
 
           {!loading && convertedAmount !== null && (
-            <div className="result-section">
-              <div className="result-card">
-                <div className="result-label">Converted Amount</div>
-                <div className="result-amount">
-                  <span className="amount-value">{convertedAmount.toFixed(2)}</span>
-                  <span className="currency-code">{toCurrency}</span>
-                </div>
-                {exchangeRate && (
-                  <div className="exchange-rate">
-                    <span>1 {fromCurrency} = {exchangeRate.toFixed(4)} {toCurrency}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <ConversionResult
+              convertedAmount={convertedAmount}
+              toCurrency={toCurrency}
+              fromCurrency={fromCurrency}
+              exchangeRate={exchangeRate}
+            />
           )}
         </div>
 
