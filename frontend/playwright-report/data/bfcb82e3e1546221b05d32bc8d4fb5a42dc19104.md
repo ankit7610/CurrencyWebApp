@@ -1,0 +1,107 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - button "Toggle theme" [ref=e5] [cursor=pointer]:
+    - img [ref=e6]
+  - banner [ref=e8]:
+    - generic [ref=e9]:
+      - img [ref=e11]
+      - heading "CURRENCY CONVERTER" [level=1] [ref=e14]:
+        - generic [ref=e15]: CURRENCY
+        - generic [ref=e16]: CONVERTER
+    - paragraph [ref=e17]: Real-time exchange rates • Powered by AI
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]: Amount
+      - textbox "Amount" [ref=e22]:
+        - /placeholder: "0.00"
+        - text: "100"
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]: From
+        - combobox "From" [ref=e27]:
+          - option "AUD"
+          - option "BGN"
+          - option "BRL"
+          - option "CAD"
+          - option "CHF"
+          - option "CNY"
+          - option "CZK"
+          - option "DKK"
+          - option "EUR"
+          - option "GBP"
+          - option "HKD"
+          - option "HRK"
+          - option "HUF"
+          - option "IDR"
+          - option "ILS"
+          - option "INR"
+          - option "ISK"
+          - option "JPY"
+          - option "KRW"
+          - option "MXN"
+          - option "MYR"
+          - option "NOK"
+          - option "NZD"
+          - option "PHP"
+          - option "PLN"
+          - option "RON"
+          - option "RUB"
+          - option "SEK"
+          - option "SGD"
+          - option "THB"
+          - option "TRY"
+          - option "USD" [selected]
+          - option "ZAR"
+      - button "Swap currencies" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+      - generic [ref=e32]:
+        - generic [ref=e33]: To
+        - combobox "To" [ref=e35]:
+          - option "AUD"
+          - option "BGN"
+          - option "BRL"
+          - option "CAD"
+          - option "CHF"
+          - option "CNY"
+          - option "CZK"
+          - option "DKK"
+          - option "EUR" [selected]
+          - option "GBP"
+          - option "HKD"
+          - option "HRK"
+          - option "HUF"
+          - option "IDR"
+          - option "ILS"
+          - option "INR"
+          - option "ISK"
+          - option "JPY"
+          - option "KRW"
+          - option "MXN"
+          - option "MYR"
+          - option "NOK"
+          - option "NZD"
+          - option "PHP"
+          - option "PLN"
+          - option "RON"
+          - option "RUB"
+          - option "SEK"
+          - option "SGD"
+          - option "THB"
+          - option "TRY"
+          - option "USD"
+          - option "ZAR"
+    - generic [ref=e37]:
+      - generic [ref=e38]: Converted Amount
+      - generic [ref=e39]:
+        - generic [ref=e40]: "85.14"
+        - generic [ref=e41]: EUR
+      - generic [ref=e43]: 1 USD = 0.8514 EUR
+  - contentinfo [ref=e44]:
+    - generic [ref=e45]:
+      - generic [ref=e46]: ⚡
+      - generic [ref=e47]: Powered by FreeCurrencyAPI
+      - generic [ref=e48]: •
+      - generic [ref=e49]: Real-time rates updated hourly
+```
