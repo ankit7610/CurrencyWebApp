@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { cacheService } from './services/CacheService';
-import { ThemeToggle } from './components/ThemeToggle';
 import { Header } from './components/Header';
 import { CurrencyInput } from './components/CurrencyInput';
-import { type Currency } from './components/CurrencySelect';
-import { CurrencyDropdown } from './components/CurrencyDropdown';
-import { PopularConversions } from './components/PopularConversions';
+import { CurrencySelect, type Currency } from './components/CurrencySelect';
 import { SwapButton } from './components/SwapButton';
 import { ConversionResult } from './components/ConversionResult';
 
@@ -27,7 +24,6 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [lastCallTime, setLastCallTime] = useState<number>(0);
 
   const THROTTLE_MS = 500;
@@ -46,8 +42,8 @@ function App() {
   const fetchCurrencies = async () => {
     try {
       const url = `${API_BASE_URL}/currencies`;
-
       const cachedData = await cacheService.getResponse(url);
+
       if (cachedData) {
         processCurrencyData(cachedData);
         return;
@@ -58,7 +54,6 @@ function App() {
 
       const data = await response.json();
       await cacheService.saveResponse(url, data);
-
       processCurrencyData(data);
     } catch (err) {
       setError('Failed to load currencies. Please ensure the backend is running.');
@@ -128,41 +123,23 @@ function App() {
   };
 
   const swapCurrencies = () => {
+    const temp = fromCurrency;
     setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  };
-
-  const handlePopularSelect = (from: string, to: string) => {
-    setFromCurrency(from);
-    setToCurrency(to);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setToCurrency(temp);
   };
 
   return (
-    <div className={`app ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+    <div className="app">
       <div className="container">
-        <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
         <Header />
 
-        <div className="converter-card">
-          {error && (
-            <div className="error-message">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {error}
-            </div>
-          )}
+        <main className="converter-card">
+          {error && <div className="error-message">{error}</div>}
 
           <CurrencyInput amount={amount} onAmountChange={handleAmountChange} />
 
           <div className="currency-row">
-            <CurrencyDropdown
+            <CurrencySelect
               id="from-currency"
               label="From"
               value={fromCurrency}
@@ -170,9 +147,11 @@ function App() {
               onChange={setFromCurrency}
             />
 
-            <SwapButton onSwap={swapCurrencies} />
+            <div className="swap-container">
+              <SwapButton onSwap={swapCurrencies} />
+            </div>
 
-            <CurrencyDropdown
+            <CurrencySelect
               id="to-currency"
               label="To"
               value={toCurrency}
@@ -183,8 +162,7 @@ function App() {
 
           {loading && (
             <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">Processing...</p>
+              <span>Updating rates...</span>
             </div>
           )}
 
@@ -196,19 +174,13 @@ function App() {
               exchangeRate={exchangeRate}
             />
           )}
-
-          <PopularConversions
-            onSelect={handlePopularSelect}
-            baseCurrency={fromCurrency}
-          />
-        </div>
+        </main>
 
         <footer className="footer">
           <div className="footer-content">
-            <span className="footer-icon">⚡</span>
             <span>Powered by FreeCurrencyAPI</span>
-            <span className="footer-separator">•</span>
-            <span>Real-time rates updated hourly</span>
+            <span>•</span>
+            <span>Hourly Updates</span>
           </div>
         </footer>
       </div>
