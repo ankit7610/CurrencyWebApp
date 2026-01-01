@@ -9,6 +9,10 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import org.junit.jupiter.api.BeforeEach
+import com.currency.service.CurrencyService
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -16,6 +20,17 @@ class CurrencyApplicationIntegrationTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @MockkBean
+    private lateinit var currencyService: CurrencyService
+
+    private val mockRates = mapOf("USD" to 1.0, "EUR" to 0.9, "GBP" to 0.8)
+
+    @BeforeEach
+    fun setup() {
+        every { currencyService.fetchCurrencyRates() } returns mockRates
+        every { currencyService.convertCurrency("USD", "EUR", 100.0) } returns Pair(90.0, 0.9)
+    }
 
     @Test
     fun `application context should load successfully`() {

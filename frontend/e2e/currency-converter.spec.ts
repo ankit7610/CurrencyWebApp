@@ -134,8 +134,6 @@ test.describe('Currency Converter - UI and Functionality', () => {
         await amountInput.clear();
         await amountInput.fill('500');
 
-        // Check for loading spinner (might be very quick)
-        const loadingSpinner = page.locator('.loading-spinner');
         // Note: Loading might be too fast to catch, so we just check it doesn't error
     });
 

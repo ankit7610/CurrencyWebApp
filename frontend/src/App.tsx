@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { cacheService } from './services/CacheService';
 import { Header } from './components/Header';
@@ -15,6 +15,10 @@ interface ConversionResponse {
   rate: number;
 }
 
+interface CurrenciesApiResponse {
+  currencies: Record<string, number>;
+}
+
 function App() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [fromCurrency, setFromCurrency] = useState<string>('USD');
@@ -29,20 +33,18 @@ function App() {
   const THROTTLE_MS = 500;
   const API_BASE_URL = 'http://localhost:8080/api';
 
-  useEffect(() => {
-    fetchCurrencies();
+  const processCurrencyData = useCallback((data: CurrenciesApiResponse) => {
+    const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
+      code,
+      rate: rate as number
+    }));
+    setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
   }, []);
 
-  useEffect(() => {
-    if (amount && parseFloat(amount) > 0) {
-      convertCurrency();
-    }
-  }, [fromCurrency, toCurrency, amount]);
-
-  const fetchCurrencies = async () => {
+  const fetchCurrencies = useCallback(async () => {
     try {
       const url = `${API_BASE_URL}/currencies`;
-      const cachedData = await cacheService.getResponse(url);
+      const cachedData = await cacheService.getResponse<CurrenciesApiResponse>(url);
 
       if (cachedData) {
         processCurrencyData(cachedData);
@@ -59,17 +61,9 @@ function App() {
       setError('Failed to load currencies. Please ensure the backend is running.');
       console.error(err);
     }
-  };
+  }, [API_BASE_URL, processCurrencyData]);
 
-  const processCurrencyData = (data: any) => {
-    const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
-      code,
-      rate: rate as number
-    }));
-    setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
-  };
-
-  const convertCurrency = async () => {
+  const convertCurrency = useCallback(async () => {
     if (!amount || parseFloat(amount) <= 0) return;
 
     const now = Date.now();
@@ -87,7 +81,7 @@ function App() {
         amount: parseFloat(amount),
       };
 
-      const cachedData = await cacheService.getResponse(url, body);
+      const cachedData = await cacheService.getResponse<ConversionResponse>(url, body);
       if (cachedData) {
         setConvertedAmount(cachedData.convertedAmount);
         setExchangeRate(cachedData.rate);
@@ -114,7 +108,17 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [amount, lastCallTime, API_BASE_URL, fromCurrency, toCurrency, THROTTLE_MS]);
+
+  useEffect(() => {
+    fetchCurrencies();
+  }, [fetchCurrencies]);
+
+  useEffect(() => {
+    if (amount && parseFloat(amount) > 0) {
+      convertCurrency();
+    }
+  }, [fromCurrency, toCurrency, amount, convertCurrency]);
 
   const handleAmountChange = (value: string) => {
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
