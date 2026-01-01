@@ -22,6 +22,11 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+frontend/playwright/.cache/
+
 # IDE
 .vscode/
 .idea/

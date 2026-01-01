@@ -1,0 +1,10 @@
+# Mark generated files as vendored or generated to exclude them from language statistics
+*.html linguist-generated
+*.json linguist-generated
+frontend/playwright-report/** linguist-vendored
+frontend/test-results/** linguist-vendored
+
+# Ensure TypeScript and Kotlin are treated as primary
+*.ts linguist-detectable=true
+*.tsx linguist-detectable=true
+*.kt linguist-detectable=true
