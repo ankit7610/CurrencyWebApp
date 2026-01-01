@@ -4,7 +4,9 @@ import { cacheService } from './services/CacheService';
 import { ThemeToggle } from './components/ThemeToggle';
 import { Header } from './components/Header';
 import { CurrencyInput } from './components/CurrencyInput';
-import { CurrencySelect, type Currency } from './components/CurrencySelect';
+import { type Currency } from './components/CurrencySelect';
+import { CurrencyDropdown } from './components/CurrencyDropdown';
+import { PopularConversions } from './components/PopularConversions';
 import { SwapButton } from './components/SwapButton';
 import { ConversionResult } from './components/ConversionResult';
 
@@ -130,6 +132,11 @@ function App() {
     setToCurrency(fromCurrency);
   };
 
+  const handlePopularSelect = (from: string, to: string) => {
+    setFromCurrency(from);
+    setToCurrency(to);
+  };
+
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -155,7 +162,7 @@ function App() {
           <CurrencyInput amount={amount} onAmountChange={handleAmountChange} />
 
           <div className="currency-row">
-            <CurrencySelect
+            <CurrencyDropdown
               id="from-currency"
               label="From"
               value={fromCurrency}
@@ -165,7 +172,7 @@ function App() {
 
             <SwapButton onSwap={swapCurrencies} />
 
-            <CurrencySelect
+            <CurrencyDropdown
               id="to-currency"
               label="To"
               value={toCurrency}
@@ -189,6 +196,11 @@ function App() {
               exchangeRate={exchangeRate}
             />
           )}
+
+          <PopularConversions
+            onSelect={handlePopularSelect}
+            baseCurrency={fromCurrency}
+          />
         </div>
 
         <footer className="footer">
