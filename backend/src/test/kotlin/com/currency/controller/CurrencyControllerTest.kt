@@ -131,8 +131,8 @@ class CurrencyControllerTest {
         val invalidRequestBody = """
             {
                 "from": "USD",
-                "to": "EUR"
-                // missing amount field
+                "to": "EUR",
+                "amount": 
             }
         """.trimIndent()
 
@@ -245,5 +245,41 @@ class CurrencyControllerTest {
                 .header("Access-Control-Request-Method", "POST")
         )
             .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `POST convert should return 400 when service throws IllegalArgumentException`() {
+        // Given
+        every { currencyService.convertCurrency("USD", "INVALID", 100.0) } throws IllegalArgumentException("Currency INVALID not found")
+
+        val requestBody = """
+            {
+                "from": "USD",
+                "to": "INVALID",
+                "amount": 100.0
+            }
+        """.trimIndent()
+
+        // When & Then
+        mockMvc.perform(
+            post("/api/convert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.message").value("Currency INVALID not found"))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+    }
+
+    @Test
+    fun `GET currencies should return 500 when service throws RuntimeException`() {
+        // Given
+        every { currencyService.fetchCurrencyRates() } throws RuntimeException("API error")
+
+        // When & Then
+        mockMvc.perform(get("/api/currencies"))
+            .andExpect(status().isInternalServerError)
+            .andExpect(jsonPath("$.message").value("API error"))
+            .andExpect(jsonPath("$.error").value("Internal Server Error"))
     }
 }
