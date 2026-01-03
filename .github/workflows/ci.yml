@@ -95,14 +95,28 @@ jobs:
         working-directory: ./backend
         run: |
           chmod +x gradlew
-          ./gradlew bootRun &
+          ./gradlew bootRun > backend.log 2>&1 &
           echo $! > backend.pid
       
       # Wait for backend to be ready
       - name: Wait for Backend
         run: |
-          timeout 120 bash -c 'until curl -f http://localhost:8080/actuator/health 2>/dev/null; do sleep 2; done' || \
-          timeout 120 bash -c 'until curl -f http://localhost:8080 2>/dev/null; do sleep 2; done'
+          echo "Waiting for backend to start..."
+          timeout 120 bash -c '
+            until curl -s http://127.0.0.1:8080/actuator/health | grep "UP" > /dev/null; do
+              echo "Waiting for /actuator/health to be UP..."
+              sleep 5
+            done
+          ' || {
+            echo "Actuator health check timed out. Checking root endpoint..."
+            timeout 60 bash -c '
+              until curl -s -f http://127.0.0.1:8080 > /dev/null; do
+                echo "Waiting for root endpoint..."
+                sleep 5
+              done
+            '
+          }
+          echo "Backend is up and running!"
       
       # Run E2E tests
       - name: Run Playwright Tests
@@ -124,7 +138,9 @@ jobs:
         if: failure()
         with:
           name: test-results
-          path: frontend/test-results/
+          path: |
+            frontend/test-results/
+            backend/backend.log
           retention-days: 30
       
       # Clean up

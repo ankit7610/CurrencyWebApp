@@ -24,6 +24,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.10.3")
     implementation("com.github.ben-manes.caffeine:caffeine")
     
