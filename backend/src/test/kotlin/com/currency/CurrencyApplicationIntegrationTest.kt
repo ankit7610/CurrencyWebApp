@@ -143,6 +143,8 @@ class CurrencyApplicationIntegrationTest {
                 "amount": 100.0
             }
         """.trimIndent()
+        
+        every { currencyService.convertCurrency("INVALID", "EUR", 100.0) } throws IllegalArgumentException("Currency INVALID not found")
 
         mockMvc.perform(
             post("/api/convert")
