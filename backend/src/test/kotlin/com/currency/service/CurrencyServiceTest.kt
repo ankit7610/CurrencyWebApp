@@ -309,4 +309,30 @@ class CurrencyServiceTest {
         assertEquals(100.0, convertedAmount, 0.01)
         assertEquals(1.0, rate, 0.01)
     }
+
+    @Test
+    fun `fetchCurrencyRates should throw exception when network error occurs`() {
+        // Given
+        every { mockHttpClient.send(any<HttpRequest>(), any<HttpResponse.BodyHandler<String>>()) } throws java.io.IOException("Network unreachable")
+
+        // When & Then
+        val exception = assertThrows<java.io.IOException> {
+            currencyService.fetchCurrencyRates()
+        }
+        assertEquals("Network unreachable", exception.message)
+    }
+
+    @Test
+    fun `fetchCurrencyRates should throw exception when API returns invalid JSON`() {
+        // Given
+        val invalidJsonResponse = "This is not JSON"
+        every { mockHttpClient.send(any<HttpRequest>(), any<HttpResponse.BodyHandler<String>>()) } returns mockResponse
+        every { mockResponse.statusCode() } returns 200
+        every { mockResponse.body() } returns invalidJsonResponse
+
+        // When & Then
+        assertThrows<com.fasterxml.jackson.core.JsonParseException> {
+            currencyService.fetchCurrencyRates()
+        }
+    }
 }

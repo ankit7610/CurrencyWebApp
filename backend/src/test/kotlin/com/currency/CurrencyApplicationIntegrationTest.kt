@@ -112,4 +112,30 @@ class CurrencyApplicationIntegrationTest {
             .andExpect(jsonPath("$.convertedAmount").isNumber)
             .andExpect(jsonPath("$.rate").isNumber)
     }
+
+    @Test
+    fun `should return 404 for unknown endpoint`() {
+        mockMvc.perform(get("/api/unknown"))
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should return 400 for invalid currency conversion end-to-end`() {
+        val requestBody = """
+            {
+                "from": "INVALID",
+                "to": "EUR",
+                "amount": 100.0
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/api/convert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").exists())
+    }
 }
