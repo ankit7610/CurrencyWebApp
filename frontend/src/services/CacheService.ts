@@ -5,8 +5,8 @@ interface CurrencyCacheDB extends DBSchema {
         key: string;
         value: {
             url: string;
-            body: any; // For POST requests
-            response: any;
+            body: unknown; // For POST requests
+            response: unknown;
             timestamp: number;
         };
     };
@@ -34,12 +34,12 @@ class CacheService {
      * For GET requests, the URL is the key.
      * For POST requests, we append a hash of the body to the URL.
      */
-    private generateCacheKey(url: string, body?: any): string {
+    private generateCacheKey(url: string, body?: unknown): string {
         if (!body) return url;
         return `${url}::${JSON.stringify(body)}`;
     }
 
-    async getResponse(url: string, body?: any): Promise<any | null> {
+    async getResponse<T>(url: string, body?: unknown): Promise<T | null> {
         const db = await this.dbPromise;
         const key = this.generateCacheKey(url, body);
         const cachedItem = await db.get(STORE_NAME, key);
@@ -54,10 +54,10 @@ class CacheService {
         }
 
         console.log(`[Cache Hit] Serving from IndexedDB: ${key}`);
-        return cachedItem.response;
+        return cachedItem.response as T;
     }
 
-    async saveResponse(url: string, response: any, body?: any): Promise<void> {
+    async saveResponse(url: string, response: unknown, body?: unknown): Promise<void> {
         const db = await this.dbPromise;
         const key = this.generateCacheKey(url, body);
 

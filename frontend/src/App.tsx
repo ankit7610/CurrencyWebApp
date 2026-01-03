@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { cacheService } from './services/CacheService';
-import { ThemeToggle } from './components/ThemeToggle';
 import { Header } from './components/Header';
 import { CurrencyInput } from './components/CurrencyInput';
 import { CurrencySelect, type Currency } from './components/CurrencySelect';
@@ -16,6 +15,10 @@ interface ConversionResponse {
   rate: number;
 }
 
+interface CurrenciesApiResponse {
+  currencies: Record<string, number>;
+}
+
 function App() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [fromCurrency, setFromCurrency] = useState<string>('USD');
@@ -25,27 +28,24 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [lastCallTime, setLastCallTime] = useState<number>(0);
 
   const THROTTLE_MS = 500;
   const API_BASE_URL = 'http://localhost:8080/api';
 
-  useEffect(() => {
-    fetchCurrencies();
+  const processCurrencyData = useCallback((data: CurrenciesApiResponse) => {
+    const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
+      code,
+      rate: rate as number
+    }));
+    setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
   }, []);
 
-  useEffect(() => {
-    if (amount && parseFloat(amount) > 0) {
-      convertCurrency();
-    }
-  }, [fromCurrency, toCurrency, amount]);
-
-  const fetchCurrencies = async () => {
+  const fetchCurrencies = useCallback(async () => {
     try {
       const url = `${API_BASE_URL}/currencies`;
+      const cachedData = await cacheService.getResponse<CurrenciesApiResponse>(url);
 
-      const cachedData = await cacheService.getResponse(url);
       if (cachedData) {
         processCurrencyData(cachedData);
         return;
@@ -56,23 +56,14 @@ function App() {
 
       const data = await response.json();
       await cacheService.saveResponse(url, data);
-
       processCurrencyData(data);
     } catch (err) {
       setError('Failed to load currencies. Please ensure the backend is running.');
       console.error(err);
     }
-  };
+  }, [API_BASE_URL, processCurrencyData]);
 
-  const processCurrencyData = (data: any) => {
-    const currencyList: Currency[] = Object.entries(data.currencies).map(([code, rate]) => ({
-      code,
-      rate: rate as number
-    }));
-    setCurrencies(currencyList.sort((a, b) => a.code.localeCompare(b.code)));
-  };
-
-  const convertCurrency = async () => {
+  const convertCurrency = useCallback(async () => {
     if (!amount || parseFloat(amount) <= 0) return;
 
     const now = Date.now();
@@ -90,7 +81,7 @@ function App() {
         amount: parseFloat(amount),
       };
 
-      const cachedData = await cacheService.getResponse(url, body);
+      const cachedData = await cacheService.getResponse<ConversionResponse>(url, body);
       if (cachedData) {
         setConvertedAmount(cachedData.convertedAmount);
         setExchangeRate(cachedData.rate);
@@ -117,7 +108,17 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [amount, lastCallTime, API_BASE_URL, fromCurrency, toCurrency, THROTTLE_MS]);
+
+  useEffect(() => {
+    fetchCurrencies();
+  }, [fetchCurrencies]);
+
+  useEffect(() => {
+    if (amount && parseFloat(amount) > 0) {
+      convertCurrency();
+    }
+  }, [fromCurrency, toCurrency, amount, convertCurrency]);
 
   const handleAmountChange = (value: string) => {
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
@@ -126,31 +127,18 @@ function App() {
   };
 
   const swapCurrencies = () => {
+    const temp = fromCurrency;
     setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setToCurrency(temp);
   };
 
   return (
-    <div className={`app ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
+    <div className="app">
       <div className="container">
-        <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
         <Header />
 
-        <div className="converter-card">
-          {error && (
-            <div className="error-message">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              {error}
-            </div>
-          )}
+        <main className="converter-card">
+          {error && <div className="error-message">{error}</div>}
 
           <CurrencyInput amount={amount} onAmountChange={handleAmountChange} />
 
@@ -163,7 +151,9 @@ function App() {
               onChange={setFromCurrency}
             />
 
-            <SwapButton onSwap={swapCurrencies} />
+            <div className="swap-container">
+              <SwapButton onSwap={swapCurrencies} />
+            </div>
 
             <CurrencySelect
               id="to-currency"
@@ -176,8 +166,7 @@ function App() {
 
           {loading && (
             <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p className="loading-text">Processing...</p>
+              <span>Updating rates...</span>
             </div>
           )}
 
@@ -189,14 +178,13 @@ function App() {
               exchangeRate={exchangeRate}
             />
           )}
-        </div>
+        </main>
 
         <footer className="footer">
           <div className="footer-content">
-            <span className="footer-icon">⚡</span>
             <span>Powered by FreeCurrencyAPI</span>
-            <span className="footer-separator">•</span>
-            <span>Real-time rates updated hourly</span>
+            <span>•</span>
+            <span>Hourly Updates</span>
           </div>
         </footer>
       </div>

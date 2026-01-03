@@ -1,25 +1,28 @@
 # Currency Conversion Web App
 
-A full-stack currency conversion application with real-time exchange rates.
+A full-stack currency conversion application with real-time exchange rates and a professional, clean UI.
 
 ## 🚀 Tech Stack
 
 ### Backend
-- **Kotlin** with Spring Boot
+- **Kotlin** with Spring Boot 3.2.0
 - **Gradle** for build management
 - **FreeCurrencyAPI** for real-time exchange rates
-- Caching enabled for optimized API calls
+- **Caffeine Cache** for optimized API calls (1-hour cache)
+- **Spring Web** with CORS support
 
 ### Frontend
-- **React** with TypeScript
-- **Vite** for fast development
-- **Vanilla CSS** with premium design (glassmorphism, gradients, animations)
+- **React 18** with TypeScript
+- **Vite** for fast development and builds
+- **Vanilla CSS** with modern, professional design
+- **Inter Font** from Google Fonts
 - Fully responsive design
 
 ## 📋 Prerequisites
 
 - **Java 17+** (for backend)
 - **Node.js 18+** (for frontend)
+- **Git** for version control
 
 ## 🛠️ Installation & Setup
 
@@ -67,18 +70,18 @@ A full-stack currency conversion application with real-time exchange rates.
 
 ## 🌟 Features
 
-- 🎨 **Futuristic UI Design** with cyberpunk-inspired aesthetics
-- 🌓 **Dark/Light Mode Toggle** - Switch between themes with smooth transitions
-- ✨ **Advanced Animations** - Floating particles, rotating borders, and smooth transitions
-- 💫 **Neon Effects** - Glowing borders and pulsing elements
+- 🎨 **Professional Light Theme** - Clean, modern design with soft gradients
+- 💼 **Business-Ready UI** - Polished interface suitable for professional use
 - 🔄 **Real-time Currency Conversion** with live exchange rates
 - 💱 **150+ Currencies** supported
-- 📱 **Fully Responsive** - Works beautifully on all devices
-- ⚡ **Fast Performance** with backend caching
+- 📱 **Fully Responsive** - Optimized for desktop, tablet, and mobile
+- ⚡ **Fast Performance** with backend caching (1-hour cache duration)
 - 🔒 **Secure API Key** stored only in backend
-- 🎭 **Interactive Elements** with hover effects and micro-animations
-- 🌐 **Animated Grid Background** with floating particles
-- 💎 **Glassmorphism Effects** with backdrop blur
+- 🎯 **Type-Safe** - Full TypeScript implementation in frontend
+- 🧩 **Component-Based Architecture** - Modular React components
+- ✨ **Smooth Interactions** - Subtle hover effects and transitions
+- 🌐 **Modern Typography** - Inter font for excellent readability
+- 💎 **Clean Design System** - Consistent colors, spacing, and shadows
 
 ## 📡 API Endpoints
 
@@ -120,32 +123,30 @@ Converts an amount from one currency to another.
 }
 ```
 
-## 🎨 UI Features
+## 🎨 UI Design
 
-### Minimal & Clean Design
-- **Modern Typography** - Uses clean sans-serif fonts for better readability.
-- **Distraction-Free Interface** - Removed excess animations and particles.
-- **Adaptive Theme** - Automatically switches between a professional light mode and a sleek dark mode.
+### Professional Light Theme
+The application features a clean, modern design optimized for professional use:
 
-### Dark Mode
-- **Slate Gray Background** suitable for low-light environments.
-- **High Contrast Text** for readability.
-- **Soft Blue Accents** for focus states.
+- **Soft Gradient Background** - Subtle gradient from light slate to light indigo
+- **Modern Typography** - Inter font family for excellent readability
+- **Consistent Color Palette** - Blue accent colors (#3b82f6) with slate grays
+- **Generous Spacing** - Ample padding and margins for a spacious feel
+- **Subtle Shadows** - Layered shadows for depth without distraction
 
-### Light Mode
-- **Clean White/Gray Background** for a professional look.
-- **Royal Blue Accents** for clarity.
-- **Subtle Shadows** for depth without clutter.
+### Design System
+- **CSS Variables** - Centralized color and spacing tokens
+- **Responsive Breakpoints** - Mobile-first responsive design
+- **Focus States** - Blue glow effect on input focus for accessibility
+- **Hover Effects** - Smooth transitions on interactive elements
 
 ### Interactive Elements
-- **Theme Toggle Button** - Smooth rotation animation when switching modes
-- **Animated Borders** - Rotating gradient borders on hover
-- **Swap Button** - 180° rotation with glow effect
-- **Input Fields** - Glowing borders on focus
-- **Loading Spinner** - Triple-ring animated loader
-- **Result Display** - Count-up animation with gradient numbers
-- **Blinking Rate Indicator** - Live status indicator
-- **Floating Particles** - Continuous upward animation
+- **Swap Button** - Smooth 180° rotation animation on hover
+- **Input Fields** - Enhanced borders with focus glow effect
+- **Custom Dropdowns** - Styled select elements with custom arrows
+- **Result Display** - Gradient background with prominent typography
+- **Loading States** - Clean loading indicators
+- **Error Messages** - Clear, user-friendly error displays
 
 ## 🔧 Configuration
 
@@ -160,28 +161,98 @@ spring.cache.caffeine.spec=expireAfterWrite=1h
 ### Frontend Configuration
 The frontend connects to the backend at `http://localhost:8080/api`. To change this, edit the `API_BASE_URL` constant in `frontend/src/App.tsx`.
 
+## 📁 Project Structure
+
+```
+CurrencyWebApp/
+├── backend/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── kotlin/com/currency/
+│   │   │   │   ├── controller/      # REST API controllers
+│   │   │   │   ├── service/         # Business logic
+│   │   │   │   ├── model/           # Data models
+│   │   │   │   └── config/          # Configuration classes
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/                    # Unit and integration tests
+│   ├── build.gradle.kts
+│   └── gradlew
+├── frontend/
+│   ├── src/
+│   │   ├── components/              # React components
+│   │   │   ├── Header.tsx
+│   │   │   ├── CurrencyInput.tsx
+│   │   │   ├── CurrencySelect.tsx
+│   │   │   ├── SwapButton.tsx
+│   │   │   └── ConversionResult.tsx
+│   │   ├── services/                # API and cache services
+│   │   ├── App.tsx                  # Main application
+│   │   ├── App.css                  # Application styles
+│   │   └── index.css                # Global styles
+│   ├── package.json
+│   └── vite.config.ts
+└── README.md
+```
+
+## 🧪 Testing
+
+### Backend Tests
+Run backend tests with:
+```bash
+cd backend
+./gradlew test
+```
+
+The backend includes:
+- Unit tests for service layer
+- Integration tests for controllers
+- Mock tests using MockK
+
+### Frontend Tests
+Run frontend tests with:
+```bash
+cd frontend
+npm test
+```
+
 ## 📝 Notes
 
-- Currency rates are cached for 1 hour to minimize API calls
-- The API key is securely stored in the backend service
-- The frontend never directly accesses the FreeCurrencyAPI
-- All currency conversions go through the backend proxy
+- **Caching**: Currency rates are cached for 1 hour to minimize API calls and improve performance
+- **Security**: The API key is securely stored in the backend service only
+- **Privacy**: The frontend never directly accesses the FreeCurrencyAPI
+- **Architecture**: All currency conversions go through the backend proxy
+- **CORS**: Backend is configured to accept requests from `http://localhost:5173`
+- **Type Safety**: Full TypeScript implementation ensures type safety across the frontend
+- **Component Architecture**: Modular React components for maintainability
 
 ## 🚀 Production Build
 
 ### Backend
+Build and run the backend in production:
 ```bash
 cd backend
-./gradlew build
+./gradlew clean build
 java -jar build/libs/currency-backend-0.0.1-SNAPSHOT.jar
 ```
 
 ### Frontend
+Build and serve the frontend for production:
 ```bash
 cd frontend
 npm run build
 npm run preview
 ```
+
+The production build will be created in `frontend/dist/` and can be deployed to any static hosting service (Netlify, Vercel, GitHub Pages, etc.).
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
@@ -189,4 +260,7 @@ This project is created for demonstration purposes.
 
 ---
 
-**Enjoy converting currencies with style! 💱✨**
+**Built with ❤️ using Kotlin, Spring Boot, React, and TypeScript**
+
+**Enjoy converting currencies with a professional touch! 💱✨**
+

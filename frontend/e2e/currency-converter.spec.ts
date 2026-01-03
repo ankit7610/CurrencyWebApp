@@ -13,14 +13,11 @@ test.describe('Currency Converter - UI and Functionality', () => {
         await expect(page).toHaveTitle(/Currency Converter/i);
 
         // Check main heading
-        await expect(page.locator('h1')).toContainText('CURRENCY');
-        await expect(page.locator('h1')).toContainText('CONVERTER');
+        await expect(page.locator('h1')).toContainText('Currency');
+        await expect(page.locator('h1')).toContainText('Converter');
 
         // Check subtitle
         await expect(page.getByText(/Real-time exchange rates/i)).toBeVisible();
-
-        // Check theme toggle button exists
-        await expect(page.locator('.theme-toggle')).toBeVisible();
 
         // Check converter card is visible
         await expect(page.locator('.converter-card')).toBeVisible();
@@ -102,31 +99,6 @@ test.describe('Currency Converter - UI and Functionality', () => {
     });
 
 
-    test('should toggle between dark and light mode', async ({ page }) => {
-        const themeToggle = page.locator('.theme-toggle');
-        const app = page.locator('.app');
-
-        // Check initial mode (dark mode)
-        await expect(app).toHaveClass(/dark-mode/);
-
-        // Click theme toggle
-        await themeToggle.click();
-
-        // Wait for transition
-        await page.waitForTimeout(500);
-
-        // Check light mode is active
-        await expect(app).toHaveClass(/light-mode/);
-
-        // Toggle back to dark mode
-        await themeToggle.click();
-        await page.waitForTimeout(500);
-
-        // Check dark mode is active again
-        await expect(app).toHaveClass(/dark-mode/);
-    });
-
-
     test('should show loading state during conversion', async ({ page }) => {
         const amountInput = page.locator('#amount-input');
 
@@ -134,8 +106,6 @@ test.describe('Currency Converter - UI and Functionality', () => {
         await amountInput.clear();
         await amountInput.fill('500');
 
-        // Check for loading spinner (might be very quick)
-        const loadingSpinner = page.locator('.loading-spinner');
         // Note: Loading might be too fast to catch, so we just check it doesn't error
     });
 
@@ -159,8 +129,9 @@ test.describe('Currency Converter - UI and Functionality', () => {
         const footer = page.locator('.footer');
         await expect(footer).toBeVisible();
         await expect(footer).toContainText('FreeCurrencyAPI');
-        await expect(footer).toContainText('Real-time rates');
+        await expect(footer).toContainText('Updates');
     });
+
 
 
     test('should maintain state after page interactions', async ({ page }) => {
