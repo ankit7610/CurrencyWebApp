@@ -428,6 +428,13 @@ body::before {
   animation: shake 0.5s ease-in-out;
 }
 
+.error-message.input-error {
+  margin-bottom: 1.5rem;
+  background: #fff4e6;
+  border-color: #fbbf24;
+  color: #d97706;
+}
+
 @keyframes shake {
 
   0%,

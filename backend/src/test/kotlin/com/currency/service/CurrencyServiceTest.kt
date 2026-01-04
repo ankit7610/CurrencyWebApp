@@ -254,12 +254,11 @@ class CurrencyServiceTest {
         every { mockResponse.statusCode() } returns 200
         every { mockResponse.body() } returns mockApiResponse
 
-        // When
-        val (convertedAmount, rate) = currencyService.convertCurrency("USD", "EUR", 0.0)
-
-        // Then
-        assertEquals(0.0, convertedAmount, 0.01)
-        assertEquals(0.85, rate, 0.01)
+        // When & Then - Should throw exception for zero amount
+        val exception = assertThrows<IllegalArgumentException> {
+            currencyService.convertCurrency("USD", "EUR", 0.0)
+        }
+        assertEquals("Amount must be greater than zero", exception.message)
     }
 
     @Test

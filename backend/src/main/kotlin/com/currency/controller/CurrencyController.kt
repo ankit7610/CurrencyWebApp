@@ -19,15 +19,23 @@ class CurrencyController(private val currencyService: CurrencyService) {
     
     @PostMapping("/convert")
     fun convertCurrency(@RequestBody request: ConversionRequest): ConversionResponse {
+        // Validate request
+        if (request.from.isBlank()) {
+            throw IllegalArgumentException("Source currency is required")
+        }
+        if (request.to.isBlank()) {
+            throw IllegalArgumentException("Target currency is required")
+        }
+        
         val (convertedAmount, rate) = currencyService.convertCurrency(
-            request.from,
-            request.to,
+            request.from.uppercase(),
+            request.to.uppercase(),
             request.amount
         )
         
         return ConversionResponse(
-            from = request.from,
-            to = request.to,
+            from = request.from.uppercase(),
+            to = request.to.uppercase(),
             amount = request.amount,
             convertedAmount = convertedAmount,
             rate = rate
