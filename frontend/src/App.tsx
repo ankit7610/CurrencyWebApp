@@ -28,6 +28,7 @@ function App() {
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [inputError, setInputError] = useState<string>('');
   const [lastCallTime, setLastCallTime] = useState<number>(0);
 
   const THROTTLE_MS = 500;
@@ -66,12 +67,20 @@ function App() {
   const convertCurrency = useCallback(async () => {
     if (!amount || parseFloat(amount) <= 0) return;
 
+    // Validate input before making API call
+    const validationError = validateAmount(amount);
+    if (validationError) {
+      setInputError(validationError);
+      return;
+    }
+
     const now = Date.now();
     if (now - lastCallTime < THROTTLE_MS) return;
     setLastCallTime(now);
 
     setLoading(true);
     setError('');
+    setInputError('');
 
     try {
       const url = `${API_BASE_URL}/convert`;
@@ -95,7 +104,10 @@ function App() {
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) throw new Error('Conversion failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Conversion failed');
+      }
 
       const data: ConversionResponse = await response.json();
       await cacheService.saveResponse(url, data, body);
@@ -103,12 +115,45 @@ function App() {
       setConvertedAmount(data.convertedAmount);
       setExchangeRate(data.rate);
     } catch (err) {
-      setError('Conversion failed. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Conversion failed. Please try again.';
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
     }
   }, [amount, lastCallTime, API_BASE_URL, fromCurrency, toCurrency, THROTTLE_MS]);
+
+  const validateAmount = (value: string): string => {
+    if (!value || value.trim() === '') {
+      return 'Please enter an amount';
+    }
+
+    const numValue = parseFloat(value);
+
+    if (isNaN(numValue)) {
+      return 'Please enter a valid number';
+    }
+
+    if (numValue < 0) {
+      return 'Amount cannot be negative';
+    }
+
+    if (numValue === 0) {
+      return 'Amount must be greater than zero';
+    }
+
+    if (numValue > 1000000000000) {
+      return 'Amount exceeds maximum allowed value (1 trillion)';
+    }
+
+    // Check for too many decimal places
+    const decimalPart = value.split('.')[1];
+    if (decimalPart && decimalPart.length > 10) {
+      return 'Amount has too many decimal places (max 10)';
+    }
+
+    return '';
+  };
 
   useEffect(() => {
     fetchCurrencies();
@@ -121,7 +166,18 @@ function App() {
   }, [fromCurrency, toCurrency, amount, convertCurrency]);
 
   const handleAmountChange = (value: string) => {
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+    // Clear input error when user starts typing
+    setInputError('');
+    
+    // Allow empty string
+    if (value === '') {
+      setAmount(value);
+      return;
+    }
+    
+    // Only allow valid numeric input with optional decimal point
+    // Allow leading zeros for values like 0.5
+    if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
   };
@@ -139,6 +195,7 @@ function App() {
 
         <main className="converter-card">
           {error && <div className="error-message">{error}</div>}
+          {inputError && <div className="error-message input-error">{inputError}</div>}
 
           <CurrencyInput amount={amount} onAmountChange={handleAmountChange} />
 
