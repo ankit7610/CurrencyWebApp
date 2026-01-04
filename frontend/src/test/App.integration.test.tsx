@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 
@@ -166,7 +166,6 @@ describe('App Integration Tests', () => {
   });
 
   it('handles conversion API errors', async () => {
-    const user = userEvent.setup();
     let callCount = 0;
     
     global.fetch = vi.fn((url) => {

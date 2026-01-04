@@ -75,7 +75,6 @@ describe('App Error Handling and Edge Cases', () => {
   });
 
   it('recovers from conversion error on retry', async () => {
-    const user = userEvent.setup();
     let callCount = 0;
     
     global.fetch = vi.fn((url) => {
@@ -349,7 +348,11 @@ describe('App Error Handling and Edge Cases', () => {
     global.localStorage = {
       getItem: () => { throw new Error('localStorage disabled'); },
       setItem: () => { throw new Error('localStorage disabled'); },
-    } as any;
+      clear: () => {},
+      key: () => null,
+      length: 0,
+      removeItem: () => {},
+    } as Storage;
     
     global.fetch = vi.fn((url) => {
       if (url.includes('/currencies')) {
