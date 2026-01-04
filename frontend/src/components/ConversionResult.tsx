@@ -1,10 +1,10 @@
 import React from 'react';
 
 interface ConversionResultProps {
-    convertedAmount: number;
+    convertedAmount: number | null | undefined;
     toCurrency: string;
     fromCurrency: string;
-    exchangeRate: number | null;
+    exchangeRate: number | null | undefined;
 }
 
 export const ConversionResult: React.FC<ConversionResultProps> = ({
@@ -13,6 +13,10 @@ export const ConversionResult: React.FC<ConversionResultProps> = ({
     fromCurrency,
     exchangeRate
 }) => {
+    if (convertedAmount === null || convertedAmount === undefined) {
+        return null;
+    }
+
     return (
         <div className="result-section">
             <div className="result-card">
