@@ -231,8 +231,8 @@ describe('App Integration Tests', () => {
     const user = userEvent.setup();
     let resolveConversion: (() => void) | null = null;
     
-    global.fetch = vi.fn((url: any) => {
-      if (url.includes('/currencies')) {
+    global.fetch = vi.fn((url: string | URL | Request) => {
+      if (url.toString().includes('/currencies')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({
@@ -255,7 +255,7 @@ describe('App Integration Tests', () => {
           } as Response);
         };
       });
-    }) as any;
+    }) as unknown as typeof fetch;
     
     render(<App />);
     

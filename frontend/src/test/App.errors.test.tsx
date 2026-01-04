@@ -21,7 +21,7 @@ describe('App Error Handling and Edge Cases', () => {
       new Promise<Response>((_, reject) => {
         setTimeout(() => reject(new Error('Network timeout')), 100);
       })
-    ) as any;
+    ) as unknown as typeof fetch;
     
     render(<App />);
     
