@@ -18,10 +18,10 @@ describe('App Error Handling and Edge Cases', () => {
 
   it('handles network timeout gracefully', async () => {
     global.fetch = vi.fn(() =>
-      new Promise((_, reject) => {
+      new Promise<Response>((_, reject) => {
         setTimeout(() => reject(new Error('Network timeout')), 100);
       })
-    );
+    ) as any;
     
     render(<App />);
     
@@ -335,9 +335,7 @@ describe('App Error Handling and Edge Cases', () => {
     const input = screen.getByLabelText('Amount') as HTMLInputElement;
     
     await user.clear(input);
-    await user.type(input, '1', { delay: 10 });
-    await user.type(input, '0', { delay: 10 });
-    await user.type(input, '0', { delay: 10 });
+    await user.type(input, '100');
     
     expect(input.value).toBe('100');
   });
