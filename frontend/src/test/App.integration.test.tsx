@@ -231,7 +231,7 @@ describe('App Integration Tests', () => {
     const user = userEvent.setup();
     let resolveConversion: (() => void) | null = null;
     
-    global.fetch = vi.fn((url) => {
+    global.fetch = vi.fn((url: any) => {
       if (url.includes('/currencies')) {
         return Promise.resolve({
           ok: true,
@@ -241,7 +241,7 @@ describe('App Integration Tests', () => {
         } as Response);
       }
       
-      return new Promise((resolve) => {
+      return new Promise<Response>((resolve) => {
         resolveConversion = () => {
           resolve({
             ok: true,
@@ -255,7 +255,7 @@ describe('App Integration Tests', () => {
           } as Response);
         };
       });
-    });
+    }) as any;
     
     render(<App />);
     
@@ -270,8 +270,8 @@ describe('App Integration Tests', () => {
     // Loading state might appear briefly
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    if (resolveConversion) {
-      resolveConversion();
+    if (resolveConversion !== null) {
+      (resolveConversion as () => void)();
     }
   });
 
